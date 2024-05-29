@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { login } from './axiosConfig';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
@@ -11,13 +11,16 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/token/', {
-                username,
-                password
-            });
-            localStorage.setItem('token', response.data.access); // Almacena el token
+            const { access, is_staff } = await login(username, password);
+           
+            localStorage.setItem('token', access); // Almacena el token
             setMessage('Login successful');
-            // Redirige a la página que desees después del inicio de sesión, por ahora solo mostramos el mensaje
+            // Redirige a la página que desees después del inicio de sesión que el rol permita
+            if (is_staff) {
+                navigate('/admin');
+            } else {
+                navigate('/user');
+            }
         } catch (error) {
             console.error(error);
             setMessage('Error logging in');

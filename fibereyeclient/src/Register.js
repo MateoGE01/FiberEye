@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { register } from './axiosConfig';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Register = () => {
@@ -12,12 +12,9 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/InfoTanques/users/register/', {
-                username,
-                password,
-                email
-            });
-            setMessage(response.data.message);
+            const response = await register(username, password, email);
+            
+            setMessage(response.message);
             navigate('/login'); // Redirige a la página de inicio de sesión después de registrarse
         } catch (error) {
             console.error(error);
