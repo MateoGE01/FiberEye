@@ -45,8 +45,7 @@ export const get_companies = async () => {
 //Borrar compañia, accion solo para administradores
 export const delete_company = async (company_id) => {
     const token = localStorage.getItem('token');
-    const response = await instance.delete('/api/InfoTanques/companies/delete_company/', 
-    {company_id},
+    const response = await instance.delete(`/api/InfoTanques/companies/delete_company/?company_id=${company_id}`, 
     {headers: {Authorization: `Bearer ${token}`}});
 
     return response.data;
@@ -65,18 +64,17 @@ export const add_tank = async(company_id, name, capacity, material, location, in
 //Ver todos los tanques por compañia, accion para todos los usuarios
 export const get_tanks = async (company_id) => {
     const token = localStorage.getItem('token');
-    const response = await instance.get('/api/InfoTanques/tanks/get_tanks_by_company/', 
-    {company_id},
+    const response = await instance.get(`/api/InfoTanques/tanks/get_tanks_by_company/?company_id=${company_id}`, 
     {headers: {Authorization: `Bearer ${token}`}});
 
     return response.data;
 }
 
+
 //Borrar tanque, accion solo para administradores
-export const delete_tank = async (tank_id) => {
+export const delete_tank = async (company_id, tank_id) => {
     const token = localStorage.getItem('token');
-    const response = await instance.delete('/api/InfoTanques/tanks/delete_tank_by_company/',
-    {tank_id},
+    const response = await instance.delete(`/api/InfoTanques/tanks/delete_tank_by_company/?company_id=${company_id}&tank_id=${tank_id}`,
     {headers : {Authorization: `Bearer ${token}`}});
 
     return response.data;

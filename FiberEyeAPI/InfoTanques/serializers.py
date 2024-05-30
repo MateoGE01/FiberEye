@@ -36,7 +36,7 @@ class CompanyNameField(serializers.RelatedField):
     
 class tankSerializer(serializers.ModelSerializer):
     
-    company = CompanyNameField(read_only=True)
+    #company = CompanyNameField(read_only=True)
     class Meta:
         model = Tank
         fields = '__all__'

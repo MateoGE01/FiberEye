@@ -50,7 +50,7 @@ class companyViewSet(viewsets.ModelViewSet):
     # Custom action to delete a company, and all its tanks
     @action(detail=False, methods=['delete'])
     def delete_company(self, request):
-        company_id = request.data.get('company_id')
+        company_id = request.query_params.get('company_id')
         if not Company.objects.filter(id=company_id).exists():
             return Response({'message': 'Company does not exist'})
         
@@ -102,11 +102,11 @@ class tankViewSet(viewsets.ModelViewSet):
     # Custom action to delete a tank from a company
     @action(detail=False, methods=['delete'])
     def delete_tank_by_company(self, request):
-        company_id = request.data.get('company_id')
+        company_id = request.query_params.get('company_id')
         if not Company.objects.filter(id=company_id).exists():
             return Response({'message': 'Company does not exist'})
         
-        tank_id = request.data.get('tank_id')
+        tank_id = request.query_params.get('tank_id')
         if not Tank.objects.filter(id=tank_id).exists():
             return Response({'message': 'Tank does not exist'})
         

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { login } from './axiosConfig';
 import { useNavigate, Link } from 'react-router-dom';
+import { Box, Button, Container, TextField, Typography, Alert } from '@mui/material';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -12,10 +13,8 @@ const Login = () => {
         e.preventDefault();
         try {
             const { access, is_staff } = await login(username, password);
-           
-            localStorage.setItem('token', access); // Almacena el token
+            localStorage.setItem('token', access);
             setMessage('Login successful');
-            // Redirige a la página que desees después del inicio de sesión que el rol permita
             if (is_staff) {
                 navigate('/admin');
             } else {
@@ -28,22 +27,44 @@ const Login = () => {
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Username</label>
-                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-                </div>
-                <div>
-                    <label>Password</label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-                <button type="submit">Login</button>
-            </form>
-            {message && <p>{message}</p>}
-            <p>Don't have an account? <Link to="/register">Register here</Link></p>
-        </div>
+        <Container maxWidth="xs">
+            <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <img src="/transparentFiberEyelogo.png" alt="FiberEye" />       
+                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="username"
+                        label="Username"
+                        name="username"
+                        autoComplete="username"
+                        autoFocus
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                        Login
+                    </Button>
+                    {message && <Alert severity={message === 'Login successful' ? 'success' : 'error'}>{message}</Alert>}
+                    <Typography variant="body2" align="center">
+                        Don't have an account? <Link to="/register">Register here</Link>
+                    </Typography>
+                </Box>
+            </Box>
+        </Container>
     );
 };
 
