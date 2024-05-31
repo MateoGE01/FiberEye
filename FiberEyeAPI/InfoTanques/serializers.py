@@ -24,10 +24,11 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['is_staff']
     
 class companySerializer(serializers.ModelSerializer):
-    
+    tank_count = serializers.IntegerField(source='get_tank_count', read_only=True)
+
     class Meta:
         model = Company
-        fields = '__all__'
+        fields = ['id','name', 'address', 'phone', 'email', 'tank_count']
 
 
 class CompanyNameField(serializers.RelatedField):

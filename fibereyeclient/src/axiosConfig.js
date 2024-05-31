@@ -80,4 +80,20 @@ export const delete_tank = async (company_id, tank_id) => {
     return response.data;
 }
 
+//Función para obtener los sensores de un tanque
+export const get_sensors = async (tank_id) => {
+    const token = localStorage.getItem('token');
+    const response = await instance.get(`/api/InfoTanques/sensors/get_sensors_by_tank/?tank_id=${tank_id}`, 
+    {headers: {Authorization: `Bearer ${token}`}});
+    return response.data;
+}
+
+//Función para obtener los sensores de un tanque
+export const get_readings = async (sensor_id) => {
+    const token = localStorage.getItem('token');
+    const response = await instance.get(`/api/InfoTanques/sensor_readings/get_readings_by_sensor/?sensor_id=${sensor_id}`, 
+    {headers: {Authorization: `Bearer ${token}`}});
+    return response.data;
+}
+
 export default instance;

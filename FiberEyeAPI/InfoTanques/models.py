@@ -6,11 +6,14 @@ class Company(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=50)
     phone = models.CharField(max_length=50)
-    email = models.EmailField(max_length=50)
-    
+    email = models.EmailField(max_length=50) 
+    imagen = models.URLField(null=True, blank=True) 
 
     def __str__(self):
         return self.name
+    
+    def get_tank_count(self):
+        return self.tank_set.count()
 
 class Tank(models.Model):
     #tank_id = models.AutoField(primary_key=True)
@@ -33,7 +36,7 @@ class Sensor(models.Model):
     install_date = models.DateField()
 
     def __str__(self):
-        return self.name
+        return f'Sensor {self.id} in tank {self.tank.id}'
     
 class Sensor_reading(models.Model):
     #reading_id = models.AutoField(primary_key=True)
@@ -43,7 +46,7 @@ class Sensor_reading(models.Model):
     value = models.FloatField()
 
     def __str__(self):
-        return self.name
+        return f'sensor_reading {self.id} in sensor {self.sensor}'
     
 class Alert(models.Model):
     #alert_id = models.AutoField(primary_key=True)
@@ -55,4 +58,4 @@ class Alert(models.Model):
     resolved = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'Alert {self.alert_type} on {self.tank} at {self.timestamp}'
+        return f'Alert {self.alert_type} on {self.tank} in {self.sensor}'

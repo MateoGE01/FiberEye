@@ -17,19 +17,18 @@ const UserPage = () => {
         try {
             const response = await get_companies();
             setCompanies(response);
-            setMessage('Companies retrieved successfully');
         } catch (error) {
+            console.error(error);
             setMessage('Error getting companies');
-            
         }
     };
 
     const handleGetTanks = async () => {
         try {
-            const response = await get_tanks(companyId); 
-            setTanks(response);
-            setMessage('Tanks retrieved successfully');
+            const response = await get_tanks(companyId);
+            setTanks(response || []);
         } catch (error) {
+            console.error(error);
             setMessage('Error getting tanks');
         }
     };
@@ -90,7 +89,7 @@ const UserPage = () => {
                     <Typography variant="h5" gutterBottom>
                         Companies
                     </Typography>
-                    {companies.length > 0 ? (
+                    {Array.isArray(companies) && companies.length > 0 ? (
                         companies.map(company => (
                             <Card key={company.id} sx={{ mb: 2 }}>
                                 <CardContent>
@@ -116,7 +115,7 @@ const UserPage = () => {
                                         Email: {company.email}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Tanks: {company.tank_count}
+                                        Number of Tanks: {company.tank_count}
                                     </Typography>
                                 </CardContent>
                             </Card>
@@ -129,7 +128,7 @@ const UserPage = () => {
                     <Typography variant="h5" gutterBottom>
                         Tanks
                     </Typography>
-                    {tanks.length > 0 ? (
+                    {Array.isArray(tanks) && tanks.length > 0 ? (
                         tanks.map(tank => (
                             <Card key={tank.id} sx={{ mb: 2 }}>
                                 <CardContent>
@@ -143,7 +142,10 @@ const UserPage = () => {
                                         />
                                     )}
                                     <Typography variant="body2" color="text.secondary">
-                                        Capacity: {tank.capacity} liters
+                                        ID: {tank.id}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Capacity: {tank.capacity}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
                                         Material: {tank.material}
@@ -161,10 +163,11 @@ const UserPage = () => {
                             </Card>
                         ))
                     ) : (
-                        <Typography>No tanks available.</Typography>
+                        <Typography>No tanks available for this company.</Typography>
                     )}
                 </Grid>
             </Grid>
+
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Sensors</DialogTitle>
                 <DialogContent>
