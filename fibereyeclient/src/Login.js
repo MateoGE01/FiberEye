@@ -13,6 +13,7 @@ const Login = () => {
         e.preventDefault();
         try {
             const { access, is_staff } = await login(username, password);
+            localStorage.setItem('username', username);
             localStorage.setItem('token', access);
             setMessage('Login successful');
             if (is_staff) {

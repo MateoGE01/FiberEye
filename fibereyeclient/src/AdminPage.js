@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { addcompany, delete_company, add_tank, get_companies, get_tanks, delete_tank } from './axiosConfig';
-import { Box, Button, Container, Grid, Card, CardContent, Typography, Alert, TextField } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { addcompany, delete_company, add_tank, get_companies, get_tanks, delete_tank, get_sensors, get_readings, add_sensor } from './axiosConfig';
+import { Box, Button, Container, Grid, Card, CardContent, CardMedia, Typography, Alert, TextField, Dialog, DialogTitle, DialogContent, Menu, MenuItem } from '@mui/material';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useNavigate } from 'react-router-dom';
+
 
 const AdminPage = () => {
     const [message, setMessage] = useState('');
@@ -10,6 +13,20 @@ const AdminPage = () => {
     const [tankId, setTankId] = useState('');
     const [newCompany, setNewCompany] = useState({ name: '', address: '', phone: '', email: '' });
     const [newTank, setNewTank] = useState({ company_id: '', name: '', capacity: '', material: '', location: '', install_date: '' });
+    const [sensors, setSensors] = useState([]);
+    const [sensorReadings, setSensorReadings] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [selectedTank, setSelectedTank] = useState(null);
+    const [newSensor, setNewSensor] = useState({ tank_id: '', model: '', type: '', install_date: '' });
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [username, setUsername] = useState('');
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Assume we store username in localStorage upon login
+        const storedUsername = localStorage.getItem('username');
+        setUsername(storedUsername);
+    }, []);
 
     const handleAddCompany = async () => {
         try {
@@ -76,10 +93,75 @@ const AdminPage = () => {
         }
     };
 
+    const handleOpenSensorDialog = async (tankId) => {
+        try {
+            const response = await get_sensors(tankId);
+            setSensors(response || []);
+            setSelectedTank(tankId);
+            setOpen(true);
+        } catch (error) {
+            console.error(error);
+            setMessage('Error getting sensors');
+        }
+    };
+
+    const handleGetReadings = async (sensorId) => {
+        try {
+            const response = await get_readings(sensorId);
+            setSensorReadings(response || []);
+        } catch (error) {
+            console.error(error);
+            setMessage('Error getting sensor readings');
+        }
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        setSensors([]);
+        setSensorReadings([]);
+    };
+
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        navigate('/login');
+    };
+
+    const handleAddSensor = async () => {
+        try {
+            const response = await add_sensor(newSensor.tank_id, newSensor.model, newSensor.type, newSensor.install_date);
+            setMessage('Sensor added successfully');
+            setNewSensor({ tank_id: '', model: '', type: '', install_date: '' });
+        } catch (error) {
+            console.error(error);
+            setMessage('Error adding sensor');
+        }
+    };
+
     return (
         <Container sx={{ mt: 4 }}>
-            <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+            <Box sx={{ position: 'absolute', top: 16, left: 16 }}>
                 <img src="/transparentFiberEyelogo.png" alt="FiberEye" style={{ width: '50px' }} />
+            </Box>
+            <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+                <Button color="inherit" onClick={handleMenuOpen}>
+                    {username}
+                </Button>
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                >
+                    <MenuItem onClick={handleLogout}>Log out</MenuItem>
+                </Menu>
             </Box>
             <Typography variant="h4" align="center" gutterBottom>
                 Admin Page
@@ -199,13 +281,51 @@ const AdminPage = () => {
                     </Card>
                     <Card sx={{ mb: 4 }}>
                         <CardContent>
+                            <Typography variant="h6" gutterBottom>Add Sensor</Typography>
+                            <TextField
+                                label="Tank ID"
+                                variant="outlined"
+                                size="small"
+                                value={newSensor.tank_id}
+                                onChange={(e) => setNewSensor({ ...newSensor, tank_id: e.target.value })}
+                                sx={{ mb: 2, mr: 2 }}
+                            /> 
+                            <TextField
+                                label="Model"
+                                variant="outlined"
+                                size="small"
+                                value={newSensor.model}
+                                onChange={(e) => setNewSensor({ ...newSensor, model: e.target.value })}
+                                sx={{ mb: 2, mr: 2 }}
+                            />
+                            <TextField
+                                label="Type"
+                                variant="outlined"
+                                size="small"
+                                value={newSensor.type}
+                                onChange={(e) => setNewSensor({ ...newSensor, type: e.target.value })}
+                                sx={{ mb: 2, mr: 2 }}
+                            />
+                            <TextField
+                                label="Install Date"
+                                variant="outlined"
+                                size="small"
+                                value={newSensor.install_date}
+                                onChange={(e) => setNewSensor({ ...newSensor, install_date: e.target.value })}
+                                sx={{ mb: 2, mr: 2 }}
+                            />
+                            <Button variant="contained" onClick={handleAddSensor}>Add Sensor</Button> 
+                        </CardContent>
+                    </Card>
+                    <Card sx={{ mb: 4 }}>
+                        <CardContent>
                             <Typography variant="h6" gutterBottom>Delete Tank</Typography>
                             <TextField
                                 label="Company ID"
                                 variant="outlined"
                                 size="small"
                                 value={companyId}
-                                onChange={(e) => setTankId(e.target.value)}
+                                onChange={(e) => setCompanyId(e.target.value)}
                                 sx={{ mb: 2, mr: 2 }}
                             />
                             <TextField
@@ -219,83 +339,117 @@ const AdminPage = () => {
                             <Button variant="contained" onClick={handleDeleteTank}>Delete Tank</Button>
                         </CardContent>
                     </Card>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                    <Typography variant="h5" gutterBottom>
-                        Companies
-                    </Typography>
-                    <Button variant="contained" onClick={handleGetCompanies} sx={{ mb: 2 }}>Get Companies</Button>
-                    {companies.length > 0 ? (
-                        companies.map(company => (
-                            <Card key={company.id} sx={{ mb: 2 }}>
-                                <CardContent>
-                                    <Typography variant="h6">{company.name}</Typography>
-                                    {company.image && (
-                                        <img src={company.image} alt={company.name} style={{ width: '100%', height: 'auto' }} />
-                                    )}
-                                    <Typography variant="body2" color="text.secondary">
-                                        ID: {company.id}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Address: {company.address}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Phone: {company.phone}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Email: {company.email}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        ))
-                    ) : (
-                        <Typography>No companies available.</Typography>
-                    )}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                    <Typography variant="h5" gutterBottom>
-                        Tanks
-                    </Typography>
-                    <TextField
-                        label="Company ID"
-                        variant="outlined"
-                        size="small"
-                        value={companyId}
-                        onChange={(e) => setCompanyId(e.target.value)}
-                        sx={{ mb: 2 }}
-                    />
-                    <Button variant="contained" onClick={handleGetTanks} sx={{ mb: 2 }}>Get Tanks by Company</Button>
-                    {tanks.length > 0 ? (
-                        tanks.map(tank => (
-                            <Card key={tank.id} sx={{ mb: 2 }}>
-                                <CardContent>
-                                    <Typography variant="h6">{tank.name}</Typography>
-                                    {tank.image && (
-                                        <img src={tank.image} alt={tank.name} style={{ width: '100%', height: 'auto' }} />
-                                    )}
-                                    <Typography variant="body2" color="text.secondary">
-                                        ID: {tank.id}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Capacity: {tank.capacity} liters
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Material: {tank.material}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Location: {tank.location}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Install Date: {tank.install_date}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        ))
-                    ) : (
-                        <Typography>No tanks available.</Typography>
-                    )}
+                    <Card sx={{ mb: 4 }}>
+                        <CardContent>
+                            <Typography variant="h6" gutterBottom>Get Companies</Typography>
+                            <Button variant="contained" onClick={handleGetCompanies}>Get Companies</Button>
+                            {companies.length > 0 && (
+                                <Box sx={{ mt: 2 }}>
+                                    <Typography variant="subtitle1">Companies</Typography>
+                                    {companies.map((company) => (
+                                        <Card key={company.id} sx={{ mb: 2 }}>
+                                            <CardContent>
+                                                <Typography variant="body1">ID: {company.id}</Typography>
+                                                <Typography variant="body1">Name: {company.name}</Typography>
+                                                <Typography variant="body1">Address: {company.address}</Typography>
+                                                <Typography variant="body1">Phone: {company.phone}</Typography>
+                                                <Typography variant="body1">Email: {company.email}</Typography>
+                                                <Typography variant="body1">Tanks: {company.tank_count}</Typography>
+                                                {company.imagen && (
+                                                    <CardMedia
+                                                        component="img"
+                                                        alt="Company Logo"
+                                                        height="140"
+                                                        image={company.imagen}
+                                                    />
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </Box>
+                            )}
+                        </CardContent>
+                    </Card>
+                    <Card sx={{ mb: 4 }}>
+                        <CardContent>
+                            <Typography variant="h6" gutterBottom>Get Tanks</Typography>
+                            <TextField
+                                label="Company ID"
+                                variant="outlined"
+                                size="small"
+                                value={companyId}
+                                onChange={(e) => setCompanyId(e.target.value)}
+                                sx={{ mb: 2, mr: 2 }}
+                            />
+                            <Button variant="contained" onClick={handleGetTanks}>Get Tanks</Button>
+                            {tanks.length > 0 && (
+                                <Box sx={{ mt: 2 }}>
+                                    <Typography variant="subtitle1">Tanks:</Typography>
+                                    {tanks.map((tank) => (
+                                        <Card key={tank.id} sx={{ mb: 2 }}>
+                                            <CardContent>
+                                                <Typography variant="body1">ID: {tank.id}</Typography>
+                                                <Typography variant="body1">Company ID: {tank.company_id}</Typography>
+                                                <Typography variant="body1">Name: {tank.name}</Typography>
+                                                <Typography variant="body1">Capacity: {tank.capacity}</Typography>
+                                                <Typography variant="body1">Material: {tank.material}</Typography>
+                                                <Typography variant="body1">Location: {tank.location}</Typography>
+                                                <Typography variant="body1">Install Date: {tank.install_date}</Typography>
+                                                {tank.imagen && (
+                                                    <CardMedia
+                                                        component="img"
+                                                        alt="Tank Image"
+                                                        sx = {{ width: 150, height: 150, mr: 2 }}
+                                                        image={tank.imagen}
+                                                    />
+                                                )}
+                                                <Button variant="contained" onClick={() => handleOpenSensorDialog(tank.id)}>View Sensors</Button>
+                                            </CardContent>
+                                        </Card>
+                                    ))}
+                                </Box>
+                            )}
+                        </CardContent>
+                    </Card>
                 </Grid>
             </Grid>
+
+            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="lg">
+                <DialogTitle>Sensors for Tank {selectedTank}</DialogTitle>
+                <DialogContent>
+                    {sensors.length > 0 ? (
+                        sensors.map(sensor => (
+                            <Card key={sensor.id} sx={{ mb: 2 }}>
+                                <CardContent>
+                                    <Typography variant="body1">Sensor ID: {sensor.id}</Typography>
+                                    <Typography variant="body1">Name: {sensor.name}</Typography>
+                                    <Typography variant="body1">Type: {sensor.type}</Typography>
+                                    <Typography variant="body1">Tank ID: {sensor.tank_id}</Typography>
+                                    <Button variant="contained" onClick={() => handleGetReadings(sensor.id)}>View Readings</Button>
+                                </CardContent>
+                            </Card>
+                        ))
+                    ) : (
+                        <Typography>No sensors available for this tank</Typography>
+                    )}
+
+                    {sensorReadings.length > 0 && (
+                        <Box sx={{ mt: 2 }}>
+                            <Typography variant="h6" gutterBottom>Sensor Readings</Typography>
+                            <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={sensorReadings}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="timestamp" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line type="monotone" dataKey="value" stroke="#8884d8" activeDot={{ r: 8 }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </Box>
+                    )}
+                </DialogContent>
+            </Dialog>
         </Container>
     );
 };

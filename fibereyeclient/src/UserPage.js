@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { get_companies, get_tanks, get_sensors, get_readings } from './axiosConfig';
-import { Box, Button, Container, Grid, Card, CardContent, CardMedia, Typography, Alert, TextField, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Box, Button, Container, Grid, Card, CardContent, CardMedia, Typography, Alert, TextField, Dialog, DialogTitle, DialogContent, Menu, MenuItem } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 const UserPage = () => {
     const [message, setMessage] = useState('');
@@ -12,6 +13,15 @@ const UserPage = () => {
     const [sensors, setSensors] = useState([]);
     const [sensorReadings, setSensorReadings] = useState([]);
     const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [username, setUsername] = useState('');
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // Assume we store username in localStorage upon login
+        const storedUsername = localStorage.getItem('username');
+        setUsername(storedUsername);
+    }, []);
 
     const handleGetCompanies = async () => {
         try {
@@ -20,7 +30,6 @@ const UserPage = () => {
             setMessage('Companies retrieved successfully');
         } catch (error) {
             setMessage('Error getting companies');
-            
         }
     };
 
@@ -62,10 +71,36 @@ const UserPage = () => {
         setSensorReadings([]);
     };
 
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        navigate('/login');
+    };
+
     return (
         <Container sx={{ mt: 4 }}>
-            <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+            <Box sx={{ position: 'absolute', top: 16, left: 16 }}>
                 <img src="/transparentFiberEyelogo.png" alt="FiberEye" style={{ width: '50px' }} />
+            </Box>
+            <Box sx={{ position: 'absolute', top: 16, right: 16 }}>
+                <Button color="inherit" onClick={handleMenuOpen}>
+                    {username}
+                </Button>
+                <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                >
+                    <MenuItem onClick={handleLogout}>Log out</MenuItem>
+                </Menu>
             </Box>
             <Typography variant="h4" align="center" gutterBottom>
                 User Page

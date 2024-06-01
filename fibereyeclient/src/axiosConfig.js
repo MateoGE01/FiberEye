@@ -96,4 +96,14 @@ export const get_readings = async (sensor_id) => {
     return response.data;
 }
 
+// Función para agregar un sensor
+export const add_sensor = async (tank_id, model, type, install_date) => {
+    const token = localStorage.getItem('token');
+    const response = await instance.post('/api/InfoTanques/sensors/add_sensor/', 
+    { tank_id, model, type, install_date },
+    { headers: { Authorization: `Bearer ${token}` } });
+
+    return response.data;
+}
+
 export default instance;
