@@ -70,6 +70,14 @@ export const get_tanks = async (company_id) => {
     return response.data;
 }
 
+// Función para conseguir un solo tanque
+export const get_tank = async (tank_id) => {
+    const token = localStorage.getItem('token');
+    const response = await instance.get(`/api/InfoTanques/tanks/get_tank/?tank_id=${tank_id}`, 
+    {headers: {Authorization: `Bearer ${token}`}});
+
+    return response.data;
+}
 
 //Borrar tanque, accion solo para administradores
 export const delete_tank = async (company_id, tank_id) => {
@@ -105,5 +113,6 @@ export const add_sensor = async (tank_id, model, type, install_date) => {
 
     return response.data;
 }
+
 
 export default instance;

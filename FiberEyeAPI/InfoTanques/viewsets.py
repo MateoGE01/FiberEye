@@ -115,6 +115,16 @@ class tankViewSet(viewsets.ModelViewSet):
         Tank.objects.filter(id=tank_id).delete()
         return Response({'message': 'Tank deleted successfully'})
 
+    # Custom action to get a tank
+    @action(detail=False, methods=['get'])
+    def get_tank(self, request):
+        tank_id = request.query_params.get('tank_id')
+        if not Tank.objects.filter(id=tank_id).exists():
+            return Response({'message': 'Tank does not exist'}, status=400)
+        
+        tank = Tank.objects.get(id=tank_id)
+        serializer = tankSerializer(tank)
+        return Response(serializer.data)
 
 class sensorViewSet(viewsets.ModelViewSet):
     queryset = Sensor.objects.all()

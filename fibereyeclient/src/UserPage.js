@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { get_companies, get_tanks, get_sensors, get_readings } from './axiosConfig';
+import { get_companies, get_tanks, get_sensors, get_readings, get_tank } from './axiosConfig';
 import { Box, Button, Container, Grid, Card, CardContent, CardMedia, Typography, Alert, TextField, Dialog, DialogTitle, DialogContent, Menu, MenuItem } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +15,8 @@ const UserPage = () => {
     const [open, setOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const [username, setUsername] = useState('');
+    const [specificTank, setSpecificTank] = useState('');
+    const [buttonClicked, setButtonClicked] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -65,6 +67,17 @@ const UserPage = () => {
         }
     };
 
+    const handeGetSpecificTank = async () => {
+        try {
+            const response = await get_tank(specificTank);
+            console.log(response);
+            setSpecificTank(response);
+        } catch (error) {
+            console.error(error);
+            setMessage('Error getting specific tank');
+        }
+    };
+
     const handleClose = () => {
         setOpen(false);
         setSensors([]);
@@ -105,6 +118,9 @@ const UserPage = () => {
             <Typography variant="h4" align="center" gutterBottom>
                 User Page
             </Typography>
+
+            
+
             <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 4 }}>
                 <Button variant="contained" onClick={handleGetCompanies}>Get Companies</Button>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -184,6 +200,9 @@ const UserPage = () => {
                                         <Grid item xs={8}>
                                             <Typography variant="h6">{tank.name}</Typography>
                                             <Typography variant="body2" color="text.secondary">
+                                                Tank ID: {tank.id}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
                                                 Capacity: {tank.capacity} liters
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary">
@@ -219,11 +238,76 @@ const UserPage = () => {
                             </Card>
                         ))
                     ) : (
-                        <Typography>No tanks available.</Typography>
+                        <Typography>No tank available.</Typography>
                     )}
                 </Grid>
+                
 
             </Grid>
+            <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <TextField
+                        label="Tank ID"
+                        variant="outlined"
+                        size="small"
+                        value={specificTank}
+                        onChange={(e) => setSpecificTank(e.target.value)}
+                        sx={{ mr: 2 }}
+                    />
+                    <Button variant="contained" onClick={() => {handeGetSpecificTank(); setButtonClicked(true);}}>Get Specific Tank</Button>
+                </Box>
+            </Box>
+                <Grid item xs={12} md={6}>
+                    <Typography variant="h5" gutterBottom>
+                        Tanks
+                    </Typography>
+                    {specificTank && buttonClicked ? (  
+                            <Card key={specificTank.id} sx={{ mb: 2 }}>
+                                <CardContent>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={8}>
+                                            <Typography variant="h6">{specificTank.name}</Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Tank ID: {specificTank.id}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Capacity: {specificTank.capacity}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Material: {specificTank.material}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Location: {specificTank.location}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Install Date: {specificTank.install_date}
+                                            </Typography>
+                                            <Button variant="contained" size="small" onClick={() => handleOpenSensorDialog(specificTank.id)}>
+                                                View Sensors
+                                            </Button>
+                                        </Grid>
+                                        {specificTank.imagen && (
+                                            <Grid item xs={4}>
+                                                <CardMedia
+                                                    component="img"
+                                                    image={specificTank.imagen}
+                                                    alt={specificTank.name}
+                                                    sx={{ border: '1px solid #ddd', 
+                                                        borderRadius: '4px', 
+                                                        padding: '4px',
+                                                        width: '150px',
+                                                        height: '150px' 
+                                                    }}
+                                                />
+                                            </Grid>
+                                        )}
+                                    </Grid>
+                                </CardContent>
+                            </Card>     
+                    ) : (
+                        <Typography>No tank available.</Typography>
+                    )}
+                </Grid>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Sensors</DialogTitle>
                 <DialogContent>
