@@ -130,29 +130,40 @@ const UserPage = () => {
                             <Card key={company.id} sx={{ mb: 2 }}>
                                 <CardContent>
                                     <Typography variant="h6">{company.name}</Typography>
-                                    {company.imagen && (
-                                        <CardMedia
-                                            component="img"
-                                            height="140"
-                                            image={company.imagen}
-                                            alt={company.name}
-                                        />
-                                    )}
-                                    <Typography variant="body2" color="text.secondary">
-                                        ID: {company.id}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Address: {company.address}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Phone: {company.phone}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Email: {company.email}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Tanks: {company.tank_count}
-                                    </Typography>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={8}>
+                                            <Typography variant="body2" color="text.secondary">
+                                                ID: {company.id}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Address: {company.address}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Phone: {company.phone}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Email: {company.email}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Tanks: {company.tank_count}
+                                            </Typography>
+                                        </Grid>
+                                        {company.imagen && (
+                                            <Grid item xs={4}>
+                                                <CardMedia
+                                                    component="img"
+                                                    image={company.imagen}
+                                                    alt={company.name}
+                                                    sx={{ border: '1px solid #ddd', 
+                                                        borderRadius: '4px', 
+                                                        padding: '4px',
+                                                        width: '150px',
+                                                        height: '150px' 
+                                                    }}
+                                                />
+                                            </Grid>
+                                        )}
+                                    </Grid>
                                 </CardContent>
                             </Card>
                         ))
@@ -160,6 +171,7 @@ const UserPage = () => {
                         <Typography>No companies available.</Typography>
                     )}
                 </Grid>
+
                 <Grid item xs={12} md={6}>
                     <Typography variant="h5" gutterBottom>
                         Tanks
@@ -168,30 +180,41 @@ const UserPage = () => {
                         tanks.map(tank => (
                             <Card key={tank.id} sx={{ mb: 2 }}>
                                 <CardContent>
-                                    <Typography variant="h6">{tank.name}</Typography>
-                                    {tank.imagen && (
-                                        <CardMedia
-                                            component="img"
-                                            height="140"
-                                            image={tank.imagen}
-                                            alt={tank.name}
-                                        />
-                                    )}
-                                    <Typography variant="body2" color="text.secondary">
-                                        Capacity: {tank.capacity} liters
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Material: {tank.material}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Location: {tank.location}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Install Date: {tank.install_date}
-                                    </Typography>
-                                    <Button variant="contained" size="small" onClick={() => handleOpenSensorDialog(tank.id)}>
-                                        View Sensors
-                                    </Button>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={8}>
+                                            <Typography variant="h6">{tank.name}</Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Capacity: {tank.capacity} liters
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Material: {tank.material}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Location: {tank.location}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Install Date: {tank.install_date}
+                                            </Typography>
+                                            <Button variant="contained" size="small" onClick={() => handleOpenSensorDialog(tank.id)}>
+                                                View Sensors
+                                            </Button>
+                                        </Grid>
+                                        {tank.imagen && (
+                                            <Grid item xs={4}>
+                                                <CardMedia
+                                                    component="img"
+                                                    image={tank.imagen}
+                                                    alt={tank.name}
+                                                    sx={{ border: '1px solid #ddd', 
+                                                        borderRadius: '4px', 
+                                                        padding: '4px',
+                                                        width: '150px',
+                                                        height: '150px' 
+                                                    }}
+                                                />
+                                            </Grid>
+                                        )}
+                                    </Grid>
                                 </CardContent>
                             </Card>
                         ))
@@ -199,6 +222,7 @@ const UserPage = () => {
                         <Typography>No tanks available.</Typography>
                     )}
                 </Grid>
+
             </Grid>
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Sensors</DialogTitle>

@@ -28,7 +28,7 @@ class companySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = ['id','name', 'address', 'phone', 'email', 'tank_count']
+        fields = ['id','name', 'address', 'phone', 'email', 'tank_count', 'imagen']
 
 
 class CompanyNameField(serializers.RelatedField):
