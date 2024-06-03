@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { addcompany, delete_company, add_tank, get_companies, get_tanks, delete_tank, get_sensors, get_readings, add_sensor } from './axiosConfig';
+import { addcompany, delete_company, add_tank, get_companies, get_tanks, delete_tank, get_sensors, get_readings, add_sensor, get_tank } from './axiosConfig';
 import { Box, Button, Container, Grid, Card, CardContent, CardMedia, Typography, Alert, TextField, Dialog, DialogTitle, DialogContent, Menu, MenuItem, Divider } from '@mui/material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +22,9 @@ const AdminPage = () => {
     const [newSensor, setNewSensor] = useState({ tank_id: '', model: '', type: '', install_date: '' });
     const [anchorEl, setAnchorEl] = useState(null);
     const [username, setUsername] = useState('');
+    const [specificTankId, setSpecificTankId] = useState('');
+    const [fetchedTank, setFetchedTank] = useState(null);
+    const [buttonClicked, setButtonClicked] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -144,6 +147,17 @@ const AdminPage = () => {
         } catch (error) {
             console.error(error);
             setMessage('Error adding sensor');
+        }
+    };
+
+    const handleGetSpecificTank = async () => {
+        try {
+            const response = await get_tank(specificTankId);
+            setFetchedTank(response);
+            setButtonClicked(true);
+        } catch (error) {
+            console.error(error);
+            setMessage('Error getting specific tank');
         }
     };
 
@@ -328,6 +342,50 @@ const AdminPage = () => {
                         </CardContent>
                     </Card>
                 </Grid>
+                <Grid item xs={12} sm={6}>
+                    <Card sx={{ mb: 4 }}>
+                        <CardContent>
+                            <Typography variant="h6" gutterBottom>Add Sensor</Typography>
+                            <TextField
+                                label="Tank ID"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                value={newSensor.tank_id}
+                                onChange={(e) => setNewSensor({ ...newSensor, tank_id: e.target.value })}
+                                sx={{ mb: 2 }}
+                            />
+                            <TextField
+                                label="Model"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                value={newSensor.model}
+                                onChange={(e) => setNewSensor({ ...newSensor, model: e.target.value })}
+                                sx={{ mb: 2 }}
+                            />
+                            <TextField
+                                label="Type"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                value={newSensor.type}
+                                onChange={(e) =>setNewSensor({ ...newSensor, type: e.target.value })}
+                                sx={{ mb: 2 }}
+                            />
+                            <TextField
+                                label=" Install Date"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                value={newSensor.install_date}
+                                onChange={(e) => setNewSensor({ ...newSensor, install_date: e.target.value })}
+                                sx={{ mb: 2 }}
+                            />
+                            <Button variant="contained" onClick={handleAddSensor}>Add Sensor</Button>
+                        </CardContent>
+                    </Card>
+                </Grid>
                 <Grid item xs={12}>
                     <Card sx={{ mb: 4 }}>
                         <CardContent>
@@ -410,7 +468,72 @@ const AdminPage = () => {
                     </Card>
                 </Grid>
             </Grid>
-
+            <Grid item xs={12} sm={6}>
+                <Card sx={{ mb: 4 }}>
+                    <CardContent>
+                        <Typography variant="h6" gutterBottom>Get Specific Tank</Typography>
+                        <TextField
+                            label="Tank ID"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            value={specificTankId}
+                            onChange={(e) => setSpecificTankId(e.target.value)}
+                            sx={{ mb: 2 }}
+                        />
+                        <Button variant="contained" onClick={handleGetSpecificTank}>Get Specific Tank</Button>
+                        {fetchedTank && buttonClicked && (
+                            <Grid item xs={12} md={6}>
+                                <Card key={fetchedTank.id} sx={{ mb: 2 }}>
+                                    <CardContent>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={8}>
+                                                <Typography variant="h6">{fetchedTank.name}</Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Tank ID: {fetchedTank.id}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Capacity: {fetchedTank.capacity} liters
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Material: {fetchedTank.material}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Location: {fetchedTank.location}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Install Date: {fetchedTank.install_date}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Company: {fetchedTank.company.name}
+                                                </Typography>
+                                                <Button variant="contained" size="small" onClick={() => handleOpenSensorDialog(fetchedTank.id)}>
+                                                    View Sensors
+                                                </Button>
+                                            </Grid>
+                                            {fetchedTank.imagen && (
+                                                <Grid item xs={4}>
+                                                    <CardMedia
+                                                        component="img"
+                                                        image={fetchedTank.imagen}
+                                                        alt={fetchedTank.name}
+                                                        sx={{ border: '1px solid #ddd', 
+                                                            borderRadius: '4px', 
+                                                            padding: '4px',
+                                                            width: '150px',
+                                                            height: '150px' 
+                                                        }}
+                                                    />
+                                                </Grid>
+                                            )}
+                                        </Grid>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        )}
+                    </CardContent>
+                </Card>
+            </Grid>                    
             <Dialog open={open} onClose={handleClose}>
                 <DialogTitle>Sensors</DialogTitle>
                 <DialogContent>
