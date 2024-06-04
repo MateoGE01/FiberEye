@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'http://127.0.0.1:8000', // Cambia esto según tu configuración
+    baseURL: 'https://stable-patrizia-uninorte-f80a8a37.koyeb.app/', // Cambia esto según tu configuración
     headers: {
         'Content-Type': 'application/json',
     }
