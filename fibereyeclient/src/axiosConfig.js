@@ -52,10 +52,10 @@ export const delete_company = async (company_id) => {
 }
 
 //Añadir tanque, accion solo para administradores
-export const add_tank = async(company_id, name, capacity, material, location, install_date) => {
+export const add_tank = async(company_id, name, capacity, material, location, install_date, imagen) => {
     const token = localStorage.getItem('token');
     const response = await instance.post('/api/InfoTanques/tanks/add_tank/', 
-    {company_id, name, capacity, material, location, install_date},
+    {company_id, name, capacity, material, location, install_date, imagen},
     {headers: {Authorization: `Bearer ${token}`}});
 
     return response.data;
