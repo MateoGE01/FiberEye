@@ -24,10 +24,10 @@ export const register = async (username, password, email) => {
 
 
 //Añadir compañia, accion solo para administradores
-export const addcompany = async ( name, address, phone, email) => {
+export const addcompany = async ( name, address, phone, email, imagen) => {
     const token = localStorage.getItem('token');
     const response = await instance.post('/api/InfoTanques/companies/add_company/', 
-    { name, address, phone, email }, 
+    { name, address, phone, email, imagen }, 
     {headers: {Authorization: `Bearer ${token}`}});
 
     return response.data;

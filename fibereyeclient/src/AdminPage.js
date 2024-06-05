@@ -34,7 +34,7 @@ const AdminPage = () => {
 
     const handleAddCompany = async () => {
         try {
-            const response = await addcompany(newCompany.name, newCompany.address, newCompany.phone, newCompany.email);
+            const response = await addcompany(newCompany.name, newCompany.address, newCompany.phone, newCompany.email, newCompany.imagen);
             setMessage('Company added successfully');
             setNewCompany({ name: '', address: '', phone: '', email: '' });
         } catch (error) {
@@ -222,6 +222,15 @@ const AdminPage = () => {
                                 fullWidth
                                 value={newCompany.email}
                                 onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })}
+                                sx={{ mb: 2 }}
+                            />
+                            <TextField
+                                label="Image URL"
+                                variant="outlined"
+                                size="small"
+                                fullWidth
+                                value={newCompany.imagen}
+                                onChange={(e) => setNewCompany({ ...newCompany, imagen: e.target.value })}
                                 sx={{ mb: 2 }}
                             />
                             <Button variant="contained" onClick={handleAddCompany}>Add Company</Button>
